@@ -1,1 +1,0 @@
-Vertical shoot'em up with 3 selectable characters: Mazinger Z, Great Mazinger and Grendizer.
