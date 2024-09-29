@@ -29,10 +29,10 @@ foreach ($xmlFile in $xmlFiles) {
 
     # use muOS assign content to set system name
     $muosSystemName = (Invoke-WebRequest -URI https://raw.githubusercontent.com/MustardOS/internal/refs/heads/main/init/MUOS/info/assign/$muosSystemFile).Content | Where-Object { $_ -match 'catalogue=' }
-    $muosSystemName = $muosSystemFile.Split('=')[1]
+    $muosSystemName = $muosSystemName.Split('=')[1]
 
-    Copy-Item -Path "${xmlFile.Directory}\box" -Destination "$muosInfo\$muosSystemFile\box"
-    Copy-Item -Path "${xmlFile.Directory}\preview" -Destination "$muosInfo\$muosSystemFile\preview"
+    Move-Item -Path "${xmlFile.Directory}\box" -Destination "$muosInfo\$muosSystemFile\box"
+    Move-Item -Path "${xmlFile.Directory}\preview" -Destination "$muosInfo\$muosSystemFile\preview"
     Invoke-WebRequest "https://raw.githubusercontent.com/Vidnez/retro-systems-icons-for-GarlicOS/refs/heads/master/system/$systemName.png" -OutFile "$muosInfo\Folder\box\$folderName.png"
 }
 

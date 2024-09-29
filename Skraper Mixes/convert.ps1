@@ -35,7 +35,6 @@ foreach ($xmlFile in $xmlFiles) {
     foreach ($game in $xml.SelectNodes("//game")) {
         $gamePath = $game.SelectSingleNode("path").InnerText
         $gameDesc = $game.SelectSingleNode("desc").InnerText #-replace "`r|`n", " " # Early versions stripped linebreaks
-        $gameGenre = $game.SelectSingleNode("genre").InnerText
 
         # Extracting filename from the path
         # This ensures the metadata get's the correct name /INFO/content/System/meta/filename.txt
