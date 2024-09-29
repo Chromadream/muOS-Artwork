@@ -1,0 +1,1 @@
+Get the ini files from https://github.com/MustardOS/internal/tree/main/init/MUOS/info/assign

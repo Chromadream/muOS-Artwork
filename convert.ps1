@@ -3,8 +3,7 @@
 # It can ingest multiple XML files and reads them from whatever 
 # directory this script is run from
 
-# Grab all XML files from current dir
-$xmlFiles = Get-ChildItem -Path $PSScriptRoot -Filter *.xml -Recurse
+$xmlFiles = Get-ChildItem -Path "F:\TBS GO EXTRA PLUS\" -Filter *.xml -Recurse
 
 Write-Host $xmlFiles
 
@@ -13,25 +12,27 @@ Write-Host $xmlFiles
 # Replace this with the output folder you'd prefer
 $muosInfo = "F:\muOS\info\catalogue"
 
-$systemLists = (Invoke-WebRequest -URI https://raw.githubusercontent.com/MustardOS/internal/refs/heads/main/init/MUOS/info/assign.json).Content | ConvertFrom-Json
-
+$systemLists = (Invoke-WebRequest -URI https://raw.githubusercontent.com/MustardOS/internal/refs/heads/main/init/MUOS/info/assign.json).Content | ConvertFrom-Json -AsHashtable
 # Load the XML file
 foreach ($xmlFile in $xmlFiles) {
     # Extract the system name from the file path
     # This will put things in the muOS directory structure according to current catalogue structure
-    if ( $systemLists.containsKey([System.IO.Path]::GetFileNameWithoutExtension($xmlFile.Directory.Name)))
+    Write-Host $xmlFile.Directory.Name
+    $systemName = $xmlFile.Directory.Name
+    $systemName = $systemName.Trim().ToLower()
+    $exists= $systemLists.containsKey($systemName)
+    if ($exists)
     {
-        $systemName = $systemLists[[System.IO.Path]::GetFileNameWithoutExtension($xmlFile.Directory.Name)]
-    } else {
-        $systemName = "arcade.ini" # hardcoded since TBS GO EXTRA have weird folders for arcade games
+        $systemName = $systemLists[$systemName]
+    }else{
+        $systemName = "Arcade.ini" # hardcoded since TBS GO EXTRA have weird folders for arcade games  
     }
-
     # use muOS assign content to set system name
-    $systemName = (Invoke-WebRequest -URI https://raw.githubusercontent.com/MustardOS/internal/refs/heads/main/init/MUOS/info/assign/$systemName).Content | Where-Object { $_ -match 'catalogue=' }
+    $didwefindanything = (Get-ChildItem -Path .. -Filter $systemName -Recurse)
+    $path = $didwefindanything | Select-Object FullName
+    $systemName = Get-Content -Path $path.FullName  | Where-Object { $_ -match 'catalogue=' }
     $systemName = $systemName.Split('=')[1]
-
     [xml]$xml = Get-Content $xmlFile
-
     foreach ($game in $xml.SelectNodes("//game")) {
         $gamePath = $game.SelectSingleNode("path").InnerText
         $gameDesc = $game.SelectSingleNode("desc").InnerText #-replace "`r|`n", " " # Early versions stripped linebreaks
